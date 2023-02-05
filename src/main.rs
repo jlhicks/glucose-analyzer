@@ -3,8 +3,10 @@ mod dexcom;
 use std::fs::File;
 
 use anyhow::Result;
+use chrono::NaiveTime;
 use clap::Parser;
 use csv::ReaderBuilder;
+use itertools::Itertools;
 
 use crate::dexcom::*;
 use crate::dexcom::DexcomRecord::EGV;
@@ -33,8 +35,11 @@ fn main() -> Result<()> {
 
     let egvs: Vec<&DexcomRecord> = records.iter()
         .filter(|r| matches!(r, EGV {..})).collect();
-    for rec in egvs {
-        println!("{:?}", rec);
+    // for rec in egvs {
+    //     println!("{:?} {:?}", rec.day(NaiveTime::from_hms_opt(4, 0, 0).unwrap()), rec);
+    // }
+    for (day, recs) in &egvs.into_iter().group_by(|e| e.day(NaiveTime::from_hms_opt(4, 0, 0).unwrap())) {
+        println!("{:?}: {}", day, recs.count());
     }
     Ok(())
 }

@@ -10,5 +10,6 @@ anyhow = "1.0.68"
 chrono = "0.4.23"
 clap = { version = "4.1.4", features = ["derive", "wrap_help"] }
 csv = "1.1.6"
+itertools = "0.10.5"
 serde = { version = "1.0.152", features = ["serde_derive"] }
 serde_derive = "1.0.152"
