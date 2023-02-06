@@ -7,9 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.68"
-chrono = "0.4.23"
+chrono = {version = "0.4.23", features = ["serde"] }
 clap = { version = "4.1.4", features = ["derive", "wrap_help"] }
 csv = "1.1.6"
 itertools = "0.10.5"
+plotly = { version = "0.8.3", features = ["kaleido"] }
 serde = { version = "1.0.152", features = ["serde_derive"] }
 serde_derive = "1.0.152"
