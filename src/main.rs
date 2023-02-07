@@ -21,6 +21,10 @@ use crate::dexcom::DexcomRecord::EGV;
 struct Args {
     /// CSV file to parse
     input_file: String,
+    /// Date to graph data
+    date: NaiveDate,
+    /// Wake-up time for graph
+    wake_time: NaiveTime,
 }
 
 fn main() -> Result<()> {
@@ -47,18 +51,26 @@ fn main() -> Result<()> {
     //     println!("{:?}: {}", day, recs.count());
     // }
 
-    let data = egvs.clone().into_iter().into_group_map_by(|x| x.day(NaiveTime::from_hms_opt(4, 0, 0).unwrap()));
-    let x: Vec<NaiveDateTime> = data.get(&NaiveDate::from_ymd_opt(2023, 1, 15)).unwrap().iter().map(|x| x.timestamp().unwrap().clone()).collect();
-    let y: Vec<u16> = data.get(&NaiveDate::from_ymd_opt(2023, 1, 15)).unwrap().iter().map(|x| x.glucose_value().unwrap()).collect();
+    let data = egvs.clone().into_iter()
+        .into_group_map_by(|x| x.day(args.wake_time));
+    let x: Vec<NaiveDateTime> = data.get(&Some(args.date)).unwrap().iter()
+        .map(|x| x.timestamp().unwrap().clone()).collect();
+    let y: Vec<u16> = data.get(&Some(args.date)).unwrap().iter()
+        .map(|x| x.glucose_value().unwrap()).collect();
     let trace = Scatter::new(x.clone(), y.clone()).mode(Mode::Markers);
     let layout = Layout::new()
         .y_axis(Axis::new().range(vec![0, 300]))
-        .x_axis(Axis::new().range(vec![x.first().unwrap().format("%Y-%m-%d %H:%M:%S").to_string(), x.last().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()]))
+        .x_axis(Axis::new().range(vec![x.first().unwrap().format("%Y-%m-%d %H:%M:%S").to_string(),
+                                       x.last().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()]))
         .shapes(vec![
-            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(0).y1(69).shape_type(Rect).fill_color("red").opacity(0.25),
-            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(70).y1(179).shape_type(Rect).fill_color("green").opacity(0.25),
-            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(180).y1(249).shape_type(Rect).fill_color("gray").opacity(0.25),
-            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(250).y1(300).shape_type(Rect).fill_color("yellow").opacity(0.25),
+            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(0).y1(69)
+                .shape_type(Rect).fill_color("red").opacity(0.25),
+            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(70).y1(179)
+                .shape_type(Rect).fill_color("green").opacity(0.25),
+            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(180).y1(249)
+                .shape_type(Rect).fill_color("gray").opacity(0.25),
+            Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(250).y1(300)
+                .shape_type(Rect).fill_color("yellow").opacity(0.25),
         ]);
     let mut plot = Plot::new();
     plot.add_trace(trace);
