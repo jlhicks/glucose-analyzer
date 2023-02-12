@@ -73,7 +73,10 @@ impl DexcomRecord {
                 index: data[0].parse()?,
                 timestamp: NaiveDateTime::parse_from_str(&data[1], "%Y-%m-%dT%H:%M:%S")?,
                 source_device_id: data[6].to_string(),
-                glucose_value: data[7].parse()?,
+                glucose_value: match data[7].parse() {
+                    Ok(v) => v,
+                    Err(_) => if &data[7] == "Low" { 39 } else { 401 },
+                },
                 transmitter_time: data[12].parse()?,
                 transmitter_id: data[13].to_string(),
             },
