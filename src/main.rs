@@ -7,7 +7,7 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use clap::Parser;
 use csv::ReaderBuilder;
 use itertools::Itertools;
-use plotly::common::Mode;
+use plotly::common::{Mode, Title};
 use plotly::{Layout, Plot, Scatter};
 use plotly::layout::{Axis, Shape};
 use plotly::layout::ShapeLayer::Below;
@@ -62,6 +62,7 @@ fn main() -> Result<()> {
         .y_axis(Axis::new().range(vec![0, 300]))
         .x_axis(Axis::new().range(vec![x.first().unwrap().format("%Y-%m-%d %H:%M:%S").to_string(),
                                        x.last().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()]))
+        .title(Title::new(&args.date.format("%A, %B %e, %Y").to_string()))
         .shapes(vec![
             Shape::new().layer(Below).x_ref("paper").x0(0).x1(1).y0(0).y1(69)
                 .shape_type(Rect).fill_color("red").opacity(0.25),
